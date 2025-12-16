@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import TodoItem from "./TodoItem";
-import { API_URL } from "./config"; // ← IMPORTAR
+import { API_URL } from "./config";
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
@@ -10,7 +10,7 @@ export default function App() {
 
   const loadTasks = async () => {
     try {
-      const res = await fetch(`${API_URL}/tasks`); // ← USAR API_URL
+      const res = await fetch(`${API_URL}/tasks`);
       const data = await res.json();
       setTasks(data);
     } catch (error) {
@@ -27,7 +27,7 @@ export default function App() {
     if (!text.trim()) return;
 
     try {
-      await fetch(`${API_URL}/tasks`, { // ← USAR API_URL
+      await fetch(`${API_URL}/tasks`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
@@ -42,10 +42,15 @@ export default function App() {
 
   const editTask = async (id, newText) => {
     try {
-      await fetch(`${API_URL}/tasks/${id}`, { // ← USAR API_URL
+      const currentTask = tasks.find(t => t.id === id);
+      
+      await fetch(`${API_URL}/tasks/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: newText }),
+        body: JSON.stringify({ 
+          text: newText,
+          completed: currentTask?.completed || 0
+        }),
       });
       loadTasks();
     } catch (error) {
@@ -55,7 +60,7 @@ export default function App() {
 
   const deleteTask = async (id) => {
     try {
-      await fetch(`${API_URL}/tasks/${id}`, { method: "DELETE" }); // ← USAR API_URL
+      await fetch(`${API_URL}/tasks/${id}`, { method: "DELETE" });
       loadTasks();
     } catch (error) {
       console.error('Error al eliminar tarea:', error);
@@ -70,7 +75,7 @@ export default function App() {
 
   const deleteSelected = async () => {
     try {
-      await fetch(`${API_URL}/tasks/delete-multiple`, { // ← USAR API_URL
+      await fetch(`${API_URL}/tasks/delete-multiple`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ids: selected }),

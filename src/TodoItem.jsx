@@ -7,12 +7,13 @@ export default function TodoItem({
 }) {
   const handleEdit = () => {
     const newText = prompt("Editar tarea:", task.text);
-    if (newText) onEdit(task.id, newText);
+    if (newText && newText.trim()) {
+      onEdit(task.id, newText.trim());
+    }
   };
 
   return (
     <div className={`task-item ${task.completed ? "completed" : ""}`}>
-
       {/* Checkbox de selección múltiple */}
       <input
         type="checkbox"

@@ -23,8 +23,18 @@ app.post('/tasks', (req, res) => {
   const newTask = req.body;
   
   if (!data.tasks) data.tasks = [];
-  data.tasks.push(newTask);
   
+  // Asignar un ID si no viene
+  if (!newTask.id) {
+    newTask.id = Date.now();
+  }
+  
+  // Asegurar que tenga completed
+  if (newTask.completed === undefined) {
+    newTask.completed = 0;
+  }
+  
+  data.tasks.push(newTask);
   writeDB(data);
   res.json(newTask);
 });
@@ -33,14 +43,20 @@ app.post('/tasks', (req, res) => {
 app.put('/tasks/:id', (req, res) => {
   const data = readDB();
   const id = parseInt(req.params.id);
-  const updatedTask = req.body;
+  const { text, completed } = req.body;
   
   const index = data.tasks.findIndex(t => t.id === id);
   
   if (index !== -1) {
-    data.tasks[index] = updatedTask;
+    // Actualizar solo lo que viene en el body
+    data.tasks[index] = {
+      ...data.tasks[index],
+      text: text !== undefined ? text : data.tasks[index].text,
+      completed: completed !== undefined ? completed : data.tasks[index].completed
+    };
+    
     writeDB(data);
-    res.json(updatedTask);
+    res.json(data.tasks[index]);
   } else {
     res.status(404).json({ error: 'Tarea no encontrada' });
   }
@@ -51,13 +67,32 @@ app.delete('/tasks/:id', (req, res) => {
   const data = readDB();
   const id = parseInt(req.params.id);
   
+  const initialLength = data.tasks.length;
   data.tasks = data.tasks.filter(t => t.id !== id);
   
+  if (data.tasks.length < initialLength) {
+    writeDB(data);
+    res.json({ ok: true });
+  } else {
+    res.status(404).json({ error: 'Tarea no encontrada' });
+  }
+});
+
+// POST /tasks/delete-multiple
+app.post('/tasks/delete-multiple', (req, res) => {
+  const data = readDB();
+  const { ids } = req.body;
+  
+  if (!ids || !Array.isArray(ids)) {
+    return res.status(400).json({ error: 'ids inválidos' });
+  }
+  
+  data.tasks = data.tasks.filter(t => !ids.includes(t.id));
   writeDB(data);
   res.json({ ok: true });
 });
 
-// GET /users (para login)
+// GET /users (para login si lo necesitas)
 app.get('/users', (req, res) => {
   const data = readDB();
   const { username, password } = req.query;
