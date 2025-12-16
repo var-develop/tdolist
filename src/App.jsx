@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import TodoItem from "./TodoItem";
+import { API_URL } from "./config"; // ← IMPORTAR
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
   const [text, setText] = useState("");
-  const [selected, setSelected] = useState([]); // ← NUEVO
-
-  const API = "http://localhost:3000/tasks";
+  const [selected, setSelected] = useState([]);
 
   const loadTasks = async () => {
-    const res = await fetch(API);
-    const data = await res.json();
-    setTasks(data);
+    try {
+      const res = await fetch(`${API_URL}/tasks`); // ← USAR API_URL
+      const data = await res.json();
+      setTasks(data);
+    } catch (error) {
+      console.error('Error al cargar tareas:', error);
+    }
   };
 
   useEffect(() => {
@@ -23,47 +26,61 @@ export default function App() {
     e.preventDefault();
     if (!text.trim()) return;
 
-    await fetch(API, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text }),
-    });
+    try {
+      await fetch(`${API_URL}/tasks`, { // ← USAR API_URL
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
 
-    setText("");
-    loadTasks();
+      setText("");
+      loadTasks();
+    } catch (error) {
+      console.error('Error al crear tarea:', error);
+    }
   };
 
   const editTask = async (id, newText) => {
-    await fetch(`${API}/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: newText }),
-    });
-    loadTasks();
+    try {
+      await fetch(`${API_URL}/tasks/${id}`, { // ← USAR API_URL
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: newText }),
+      });
+      loadTasks();
+    } catch (error) {
+      console.error('Error al editar tarea:', error);
+    }
   };
 
   const deleteTask = async (id) => {
-    await fetch(`${API}/${id}`, { method: "DELETE" });
-    loadTasks();
+    try {
+      await fetch(`${API_URL}/tasks/${id}`, { method: "DELETE" }); // ← USAR API_URL
+      loadTasks();
+    } catch (error) {
+      console.error('Error al eliminar tarea:', error);
+    }
   };
 
-  // ← NUEVO: manejar selecciones
   const toggleSelect = (id) => {
     setSelected((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
 
-  // ← NUEVO: borrar seleccionadas
   const deleteSelected = async () => {
-    await fetch(`${API}/delete-multiple`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ids: selected }),
-    });
+    try {
+      await fetch(`${API_URL}/tasks/delete-multiple`, { // ← USAR API_URL
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: selected }),
+      });
 
-    setSelected([]);
-    loadTasks();
+      setSelected([]);
+      loadTasks();
+    } catch (error) {
+      console.error('Error al eliminar tareas:', error);
+    }
   };
 
   return (
@@ -80,7 +97,6 @@ export default function App() {
         <button>Añadir Tarea</button>
       </form>
 
-      {/* Botón para borrar varias */}
       {selected.length > 0 && (
         <button className="delete-multiple" onClick={deleteSelected}>
           Eliminar seleccionadas ({selected.length})
