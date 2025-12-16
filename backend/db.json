@@ -1,0 +1,55 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "admin1",
+      "password": "admin1"
+    },
+    {
+      "id": 2,
+      "username": "admin2",
+      "password": "admin2"
+    },
+    {
+      "id": 3,
+      "username": "Ana Sofia Mazo",
+      "password": "Ana456"
+    },
+    {
+      "id": 4,
+      "username": "Paula Buitrago",
+      "password": "Paula789"
+    },
+    {
+      "id": 5,
+      "username": "Juan Camilo",
+      "password": "Juan321"
+    },
+    {
+      
+      "id": 6,
+      "username": "Julian Rivera",
+      "password": "Julian654"
+    },
+    {
+      "id": 7,
+      "username": "Carlos Sanchez",
+      "password": "Carlos987"
+    },
+    {
+      "id": 8,
+      "username": "Juliana Gomez",
+      "password": "Juliana147" 
+    },
+    {
+      "id": 9,
+      "username": "Diego Martinez",
+      "password": "Diego258"
+    },
+    {
+      "id": 10,
+      "username": "Valentina Rojas",
+      "password": "Valentina369"
+    }
+]
+}
